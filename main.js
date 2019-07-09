@@ -3,47 +3,41 @@ function decodeHtml(html) {
     txt.innerHTML = html;
     return txt.value;
 }
+
+function getHTML(className, index){
+    var el = document.getElementsByClassName(className);
+    return el ? (el[index] ? el[index].innerHTML : '') : '';
+}
+
+function getTagHTML(className, classIndex, tagName, tagIndex){
+    var el = document.getElementsByClassName(className);
+    el = el ? (el[classIndex] ? el[classIndex] : '') : '';
+    if (el) {
+        var tag = el.getElementsByTagName(tagName);
+        return tag ? (tag[tagIndex] ? tag[tagIndex].innerHTML : '') : '';
+    }
+    return '';
+}
+
 function main(){
     data = "";
-    var date = document.getElementsByClassName('cbeventdate')[0].innerHTML;
-    var nl = "&#10;";
-    data += '[Event "' + document.getElementsByClassName('cbevent')[0].innerHTML + '"]' + nl;
-    data += '[Site "' + document.getElementsByClassName('cbsite')[0].innerHTML + '"]' + nl;
-    data += '[Date "' + date.slice(6, 11) + '.' + date.slice(3, 5) + '.' + date.slice(0, 2) + '"]' + nl;
-    data += '[White "' + document.getElementsByClassName('cbplayerwhite')[0].getElementsByTagName('span')[0].innerHTML + '"]' + nl;
-    data += '[Black "' + document.getElementsByClassName('cbplayerblack')[0].getElementsByTagName('span')[0].innerHTML + '"]' + nl;
-    data += '[WhiteElo "' + document.getElementsByClassName('cbplayerwhite')[0].getElementsByTagName('span')[1].innerHTML + '"]' + nl;
-    data += '[BlackElo "' + document.getElementsByClassName('cbplayerblack')[0].getElementsByTagName('span')[1].innerHTML + '"]' + nl;
-    var res = document.getElementsByClassName('cbresult')[0].getElementsByTagName('span')[0].innerHTML.replace('–', '-');
+    var date = getHTML('cbeventdate', 0);
+    var nl = "\n";
+    data += '[Event "' + getHTML('cbevent', 0) + '"]' + nl;
+    data += '[Site "' + getHTML('cbsite', 0) + '"]' + nl;
+    data += '[Date "' + (date ? date.slice(6, 11) + '.' + date.slice(3, 5) + '.' + date.slice(0, 2) : '') + '"]' + nl;
+    data += '[White "' + getTagHTML('cbplayerwhite', 0, 'span', 0) + '"]' + nl;
+    data += '[Black "' + getTagHTML('cbplayerblack', 0, 'span', 0) + '"]' + nl;
+    data += '[WhiteElo "' + getTagHTML('cbplayerwhite', 0, 'span', 1) + '"]' + nl;
+    data += '[BlackElo "' + getTagHTML('cbplayerblack', 0, 'span', 1) + '"]' + nl;
+    var res = getTagHTML('cbresult', 0, 'span', 0).replace('–', '-');
     data += '[Result "' + ((res == (decodeHtml('&frac12;')+'-'+decodeHtml('&frac12;'))) ? '1/2-1/2' : res) + '"]' + nl + nl;
     var game = "";
-    for (var i = 0; i < document.getElementsByClassName('cbmove').length; i++) {
-        game += document.getElementsByClassName('cbmove')[i].innerHTML + ' ';
+    var moves = document.getElementsByClassName('cbmove');
+    for (var i = 0; i < moves.length; i++) {
+        game += moves[i].innerHTML + ' ';
     }
     data += game;
-    var d = document.createElement('button');
-    d.innerHTML = "Copy game";
-    d.style.position = 'absolute';
-    d.style.top = '30%';
-    d.style.left = '50%';
-    d.style.zIndex = '9999';
-    d.id = 'copy';
-    d.onclick = function () {
-        try {
-            var t = document.createElement('textarea');
-            t.innerHTML = data;
-            document.body.appendChild(t);
-            t.focus();
-            t.select();
-            document.execCommand('copy');
-            document.body.removeChild(t);
-            var b = document.getElementById('copy');
-            document.body.removeChild(b);
-            alert('PGN copied successfully!');
-        } catch (e) {
-            alert('PGN copying failed!');
-        };
-    };
-    document.body.appendChild(d);
+    alert(data);
 }
 main();
