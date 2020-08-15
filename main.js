@@ -14,7 +14,12 @@ function getTagHTML(className, classIndex, tagName, tagIndex){
     el = el ? (el[classIndex] ? el[classIndex] : '') : '';
     if (el) {
         var tag = el.getElementsByTagName(tagName);
-        return tag ? (tag[tagIndex] ? tag[tagIndex].innerHTML : '') : '';
+        if(tag[tagIndex].getElementsByTagName('a').length){
+            tag = tag[tagIndex].getElementsByTagName('a')[0].innerHTML;
+        }else{
+            tag = tag[tagIndex].innerHTML;
+        }
+        return tag;
     }
     return '';
 }
@@ -26,6 +31,7 @@ function main(){
     data += '[Event "' + getHTML('cbevent', 0) + '"]' + nl;
     data += '[Site "' + getHTML('cbsite', 0) + '"]' + nl;
     data += '[Date "' + (date ? date.slice(6, 11) + '.' + date.slice(3, 5) + '.' + date.slice(0, 2) : '') + '"]' + nl;
+    data += '[Round "?"]' + nl;
     data += '[White "' + getTagHTML('cbplayerwhite', 0, 'span', 0) + '"]' + nl;
     data += '[Black "' + getTagHTML('cbplayerblack', 0, 'span', 0) + '"]' + nl;
     data += '[WhiteElo "' + getTagHTML('cbplayerwhite', 0, 'span', 1) + '"]' + nl;
